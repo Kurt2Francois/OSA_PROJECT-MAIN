@@ -1,0 +1,61 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>User Sign In - OSA Partnership Monitoring</title>
+
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+
+    <!-- Custom CSS -->
+    <link rel="stylesheet" href="{% static 'css/style.css' %}">
+</head>
+<body class="flex flex-col min-h-screen">
+    <!-- Top Red Bar -->
+    <header class="w-full h-20 bg-red-800 shadow-lg"></header>
+
+    <!-- Main Content Area -->
+    <main class="flex flex-grow justify-center items-center py-8">
+        <div class="w-full max-w-md px-12 py-16 bg-gray-300 rounded-lg shadow-xl">
+            
+            <!-- Django Messages -->
+            {% if messages %}
+                {% for message in messages %}
+                    <div class="text-center text-sm p-2 rounded mb-6 {% if message.tags == 'error' %}bg-red-200 text-red-800{% else %}bg-green-200 text-green-800{% endif %}">
+                        {{ message }}
+                    </div>
+                {% endfor %}
+            {% endif %}
+
+            <form method="POST" action="{% url 'login' %}" class="space-y-12">
+                {% csrf_token %}
+                
+                <!-- Email Input -->
+                <div class="flex items-center space-x-4">
+                    <label for="email" class="text-sm font-normal whitespace-nowrap" style="min-width: 80px;">Email:</label>
+                    <input type="email" id="email" name="email" required class="input-underline flex-1">
+                </div>
+
+                <!-- Password Input -->
+                <div class="flex items-center space-x-4">
+                    <label for="password" class="text-sm font-normal whitespace-nowrap" style="min-width: 80px;">Password:</label>
+                    <input type="password" id="password" name="password" required class="input-underline flex-1">
+                </div>
+
+                <!-- Sign In Button -->
+                <div class="flex flex-col items-center pt-8 space-y-4">
+                    <button type="submit" class="sign-in-btn">Sign In</button>
+                    <a href="{% url 'signup' %}" class="create-account-link">Create Account</a>
+                </div>
+            </form>
+        </div>
+    </main>
+
+    <!-- Page Label -->
+    <div class="fixed top-2 left-4 text-gray-400 text-xs">
+        Page 1 - Normal Log in design for our project (not final design)
+    </div>
+</body>
+</html>

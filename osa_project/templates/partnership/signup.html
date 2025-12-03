@@ -1,0 +1,126 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>User Sign Up - OSA Partnership Monitoring</title>
+    <!-- Load Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="{% static 'css/custom.css' %}">
+</head>
+<body class="flex flex-col min-h-screen">
+    <!-- Top Red Bar -->
+    <header class="w-full h-12 md:h-16 bg-red-700 shadow-lg"></header>
+
+    <!-- Main Content Area -->
+    <main class="flex flex-grow justify-center items-start py-10">
+        <div class="w-11/12 max-w-xl p-6 md:p-8 bg-gray-300 rounded-xl shadow-2xl transition-all duration-300">
+            
+            <p class="text-xs text-gray-600 text-center mb-6 italic">Normal Sign up Accounts</p>
+
+            {% if messages %}
+                {% for message in messages %}
+                    <div class="text-center text-sm p-2 rounded mb-4 {% if message.tags == 'error' %}bg-red-200 text-red-800{% else %}bg-green-200 text-green-800{% endif %}">
+                        {{ message }}
+                    </div>
+                {% endfor %}
+            {% endif %}
+
+            <!-- FIXED URL -->
+            <form method="POST" action="{% url 'signup' %}" class="space-y-4">
+                {% csrf_token %}
+
+                <!-- Business name -->
+                <div class="flex flex-col md:flex-row items-center space-y-2 md:space-y-0 md:space-x-2">
+                    <label for="business_name" class="text-sm font-medium w-40 text-right">Business name:</label>
+                    <input type="text" id="business_name" name="business_name" required class="input-line p-1 flex-1 focus:border-red-700">
+                </div>
+
+                <!-- Department name -->
+                <div class="flex flex-col md:flex-row items-center space-y-2 md:space-y-0 md:space-x-2">
+                    <label for="department_name" class="text-sm font-medium w-40 text-right">Department name:</label>
+                    <input type="text" id="department_name" name="department_name" required class="input-line p-1 flex-1 focus:border-red-700">
+                </div>
+
+                <!-- Contact Person -->
+                <div class="flex flex-col md:flex-row items-center space-y-2 md:space-y-0 md:space-x-2">
+                    <label for="contact_person" class="text-sm font-medium w-40 text-right">Contact Person:</label>
+                    <input type="text" id="contact_person" name="contact_person" required class="input-line p-1 flex-1 focus:border-red-700">
+                </div>
+
+                <!-- Contact # -->
+                <div class="flex flex-col md:flex-row items-center space-y-2 md:space-y-0 md:space-x-2">
+                    <label for="contact_number" class="text-sm font-medium w-40 text-right">Contact #:</label>
+                    <input type="tel" id="contact_number" name="contact_number" required class="input-line p-1 flex-1 focus:border-red-700">
+                </div>
+
+                <!-- Email -->
+                <div class="flex flex-col md:flex-row items-center space-y-2 md:space-y-0 md:space-x-2 pt-4 border-t border-gray-400">
+                    <label for="email" class="text-sm font-medium w-40 text-right">Email:</label>
+                    <input type="email" id="email" name="email" required class="input-line p-1 flex-1 focus:border-red-700" placeholder="user@example.com">
+                </div>
+
+                <!-- Confirm Email -->
+                <div class="flex flex-col md:flex-row items-center space-y-2 md:space-y-0 md:space-x-2">
+                    <label for="confirm_email" class="text-sm font-medium w-40 text-right">Confirm Email:</label>
+                    <input type="email" id="confirm_email" name="confirm_email" required class="input-line p-1 flex-1 focus:border-red-700">
+                </div>
+
+                <!-- Password -->
+                <div class="flex flex-col md:flex-row items-center space-y-2 md:space-y-0 md:space-x-2 pt-4">
+                    <label for="password" class="text-sm font-medium w-40 text-right">Password:</label>
+                    <input type="password" id="password" name="password" required class="input-line p-1 flex-1 focus:border-red-700">
+                </div>
+
+                <!-- Confirm Password -->
+                <div class="flex flex-col md:flex-row items-center space-y-2 md:space-y-0 md:space-x-2">
+                    <label for="confirm_password" class="text-sm font-medium w-40 text-right">Confirm Password:</label>
+                    <input type="password" id="confirm_password" name="confirm_password" required class="input-line p-1 flex-1 focus:border-red-700">
+                </div>
+                
+                <div id="messageBox" class="text-center text-sm p-2 rounded hidden"></div>
+
+                <div class="flex flex-col items-center pt-4">
+                    <button type="submit" class="sign-up-button w-32 py-2 mb-3 bg-gray-100 text-gray-800 rounded-lg border border-gray-400 hover:bg-white hover:shadow-md transition duration-150">
+                        Sign up
+                    </button>
+                    
+                    <a href="{% url 'login' %}" class="text-xs text-gray-600 hover:text-red-700 transition duration-150">
+                        Already have an account? Sign In
+                    </a>
+                </div>
+            </form>
+        </div>
+    </main>
+
+    <script>
+        document.querySelector('form').addEventListener('submit', function(event) {
+            const password = document.getElementById('password').value;
+            const confirmPassword = document.getElementById('confirm_password').value;
+            const email = document.getElementById('email').value;
+            const confirmEmail = document.getElementById('confirm_email').value;
+            const messageBox = document.getElementById('messageBox');
+            
+            messageBox.classList.add('hidden');
+            messageBox.classList.remove('bg-red-200', 'text-red-800');
+
+            if (email !== confirmEmail) {
+                event.preventDefault();
+                messageBox.textContent = 'Error: Email addresses do not match.';
+                messageBox.classList.remove('hidden');
+                messageBox.classList.add('bg-red-200', 'text-red-800');
+                return;
+            }
+
+            if (password !== confirmPassword) {
+                event.preventDefault();
+                messageBox.textContent = 'Error: Passwords do not match.';
+                messageBox.classList.remove('hidden');
+                messageBox.classList.add('bg-red-200', 'text-red-800');
+                return;
+            }
+        });
+    </script>
+</body>
+</html>

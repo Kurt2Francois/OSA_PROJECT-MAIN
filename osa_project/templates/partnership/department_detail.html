@@ -1,0 +1,115 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{{ department.name }} - HCDC Partnership System</title>
+    <link rel="stylesheet" href="/static/css/style.css">
+</head>
+<body>
+    <div class="header">
+        <div class="nav-menu">
+            <a href="{% url 'dashboard' %}" class="btn-back">← Back to Dashboard</a>
+            <a href="{% url 'logout' %}" class="btn-logout">Logout</a>
+        </div>
+    </div>
+    
+    <div class="detail-container">
+        <h1>Department Details</h1>
+        
+        <div class="detail-grid">
+            <div class="detail-sidebar">
+                <div class="dept-logo-large">
+                    {% if department.logo %}
+                        <img src="{{ department.logo.url }}" alt="{{ department.short_name }}">
+                    {% else %}
+                        <div class="dept-logo-placeholder-large">{{ department.short_name|slice:":3" }}</div>
+                    {% endif %}
+                </div>
+            </div>
+            
+            <div class="detail-main">
+                <h2>{{ department.name }}</h2>
+                
+                <div class="date-fields">
+                    <div class="date-field">
+                        <label>Established Partner Date:</label>
+                        <div class="date-display">{{ department.established_date|date:"m/d/Y" }}</div>
+                    </div>
+                    
+                    <div class="date-field">
+                        <label>Expiration Partner Date:</label>
+                        <div class="date-display">{{ department.expiration_date|date:"m/d/Y" }}</div>
+                    </div>
+                </div>
+                
+                <div class="info-section">
+                    <h3>Account / partnership details</h3>
+                    
+                    <div class="info-grid">
+                        <div class="info-item">
+                            <span class="info-label">Department name:</span>
+                            <span class="info-value">{{ department.department_name }}</span>
+                        </div>
+                        
+                        <div class="info-item">
+                            <span class="info-label">Business name:</span>
+                            <span class="info-value">{{ department.business_name }}</span>
+                        </div>
+                        
+                        <div class="info-item">
+                            <span class="info-label">Contact Person:</span>
+                            <span class="info-value">{{ department.contact_person }}</span>
+                        </div>
+                        
+                        <div class="info-item">
+                            <span class="info-label">Contact #:</span>
+                            <span class="info-value">{{ department.contact_number }}</span>
+                        </div>
+                        
+                        <div class="info-item">
+                            <span class="info-label">Email Address:</span>
+                            <span class="info-value">{{ department.email }}</span>
+                        </div>
+                    </div>
+                    
+                    <div class="date-fields">
+                        <div class="date-field">
+                            <label>Established Partner Date:</label>
+                            <div class="date-display">{{ department.established_date|date:"m/d/Y" }}</div>
+                        </div>
+                        
+                        <div class="date-field">
+                            <label>Expiration Partner Date:</label>
+                            <div class="date-display">{{ department.expiration_date|date:"m/d/Y" }}</div>
+                        </div>
+                    </div>
+                    
+                    <div class="status-section">
+                        <span class="status-label">Partnership Status:</span>
+                        <div class="status-buttons">
+                            <span class="status-btn {% if department.partnership_status == 'OK' %}active{% endif %}">OK</span>
+                            <span class="status-btn {% if department.partnership_status == 'NO' %}active{% endif %}">NO</span>
+                            <span class="status-btn {% if department.partnership_status == 'UNIDENTIFIED' %}active{% endif %}">UNIDENTIFIED</span>
+                        </div>
+                    </div>
+                    
+                    <div class="remarks-section">
+                        <p class="remarks-text">{{ department.remarks|default:"Remarks Part (not finished, still looking for a solution)" }}</p>
+                    </div>
+                </div>
+                
+                {% if user.is_superuser or user.profile.user_type in 'owner,admin' or department.owner == user %}
+                <a href="{% url 'department_edit' department.id %}" class="btn-primary">Edit Information</a>
+                {% endif %}
+            </div>
+            
+            <div class="detail-widgets">
+                <div class="widgets-placeholder">
+                    <p>Widgets</p>
+                </div>
+            </div>
+        </div>
+    </div>
+</body>
+</html>

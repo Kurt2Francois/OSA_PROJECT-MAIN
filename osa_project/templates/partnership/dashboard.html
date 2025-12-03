@@ -1,0 +1,70 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard - HCDC Partnership System</title>
+    <link rel="stylesheet" href="{% static 'css/style.css' %}">
+</head>
+<body>
+    <!-- Header -->
+    <div class="header">
+        <div class="nav-menu">
+            <span>Welcome, {{ user.first_name|default:user.username }}</span>
+            <a href="{% url 'logout' %}" class="btn-logout">Logout</a>
+            {% if user.is_superuser or user.profile.user_type == 'owner' %}
+                <a href="{% url 'owner_panel' %}" class="btn-admin">Owner Panel</a>
+            {% elif user.profile.user_type == 'admin' %}
+                <a href="{% url 'admin_panel' %}" class="btn-admin">Admin Panel</a>
+            {% endif %}
+        </div>
+    </div>
+
+    <!-- Main Dashboard -->
+    <div class="dashboard-container">
+        <h1>Your Departments</h1>
+
+        {% if messages %}
+            {% for message in messages %}
+                <div class="alert alert-{{ message.tags }}">{{ message }}</div>
+            {% endfor %}
+        {% endif %}
+
+        <div class="departments-grid">
+            {% for dept in departments %}
+            <div class="department-card">
+                <!-- Department Logo -->
+                <div class="dept-logo">
+                    {% if dept.logo_path %}
+                        <img src="{{ dept.logo_path.url }}" alt="{{ dept.department_name }}">
+                    {% else %}
+                        <div class="dept-logo-placeholder">{{ dept.department_name|slice:":3" }}</div>
+                    {% endif %}
+                </div>
+
+                <!-- Department Info -->
+                <div class="dept-info">
+                    <h3>{{ dept.department_name }}</h3>
+                    <p class="business-name">{{ dept.business_name }}</p>
+
+                    <!-- Actions -->
+                    <div class="dept-actions">
+                        <a href="{% url 'department_detail' dept.id %}" class="btn-link">See information</a>
+                        <div class="status-indicator">
+                            <span>Partnership status:</span>
+                            <div class="status-circle {{ dept.status_color }}"></div>
+                            <span class="status-text">{{ dept.partnership_status|capfirst }}</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            {% empty %}
+            <div class="no-departments">
+                <p>No departments found. Please contact the administrator to add departments.</p>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+</body>
+</html>

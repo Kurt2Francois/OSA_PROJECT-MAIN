@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Edit {{ department.department_name }} - HCDC Partnership System</title>
+    <link rel="stylesheet" href="/static/css/style.css">
+</head>
+<body>
+    <div class="header">
+        <div class="nav-menu">
+            <a href="{% url 'department_detail' department.id %}" class="btn-back">← Back</a>
+            <a href="{% url 'logout' %}" class="btn-logout">Logout</a>
+        </div>
+    </div>
+    
+    <div class="edit-container">
+        <h1>Edit Partner Information</h1>
+        
+        {% if messages %}
+            {% for message in messages %}
+                <div class="alert alert-{{ message.tags }}">
+                    {{ message }}
+                </div>
+            {% endfor %}
+        {% endif %}
+        
+        <!-- Added enctype for file upload -->
+        <form method="POST" action="{% url 'department_edit' department.id %}" enctype="multipart/form-data">
+            {% csrf_token %}
+            
+            <div class="form-group">
+                <label>Business name:</label>
+                <input type="text" name="business_name" value="{{ department.business_name }}" required>
+            </div>
+            
+            <div class="form-group">
+                <label>Department name:</label>
+                <input type="text" name="department_name" value="{{ department.department_name }}" required>
+            </div>
+            
+            <div class="form-group">
+                <label>Contact Person:</label>
+                <input type="text" name="contact_person" value="{{ department.contact_person }}" required>
+            </div>
+            
+            <div class="form-group">
+                <label>Contact #:</label>
+                <input type="text" name="contact_number" value="{{ department.contact_number }}" required>
+            </div>
+            
+            <div class="form-group">
+                <label>Email Address:</label>
+                <input type="email" name="email" value="{{ department.email }}" required>
+            </div>
+            
+            <div class="form-row">
+                <div class="form-group">
+                    <label>Established Partner Date:</label>
+                    <input type="date" name="established_date" value="{{ department.established_date|date:'Y-m-d' }}" required>
+                </div>
+                
+                <div class="form-group">
+                    <label>Expiration Partner Date:</label>
+                    <input type="date" name="expiration_date" value="{{ department.expiration_date|date:'Y-m-d' }}" required>
+                </div>
+            </div>
+            
+            <div class="form-group">
+                <label>Partnership Status:</label>
+                <select name="partnership_status" required>
+                    <option value="active" {% if department.partnership_status == 'active' %}selected{% endif %}>Active</option>
+                    <option value="inactive" {% if department.partnership_status == 'inactive' %}selected{% endif %}>Inactive</option>
+                    <option value="pending" {% if department.partnership_status == 'pending' %}selected{% endif %}>Pending</option>
+                </select>
+            </div>
+            
+            <!-- New file upload for department logo -->
+            <div class="form-group">
+                <label>Department Logo:</label>
+                <input type="file" name="logo_path" accept="image/*">
+                {% if department.logo_path %}
+                    <p>Current logo:</p>
+                    <img src="{{ department.logo_path.url }}" alt="Logo" style="max-height:50px;">
+                {% endif %}
+            </div>
+            
+            <div class="form-group">
+                <label>Remarks:</label>
+                <textarea name="remarks_status" rows="4">{{ department.remarks_status }}</textarea>
+            </div>
+            
+            <button type="submit" class="btn-primary">Save</button>
+        </form>
+    </div>
+</body>
+</html>

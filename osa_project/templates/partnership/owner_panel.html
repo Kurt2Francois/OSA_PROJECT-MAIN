@@ -1,0 +1,143 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Owner Panel - OSA Partnership Monitoring</title>
+    <!-- Load Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="{% static 'css/custom.css' %}">
+</head>
+<body class="flex flex-col min-h-screen">
+    <!-- Top Red Bar -->
+    <header class="w-full h-12 md:h-16 bg-red-700 shadow-lg flex items-center justify-between px-6">
+        <h2 class="text-white font-semibold text-lg">OSA Partnership Monitoring - Owner Panel</h2>
+        <div class="flex gap-4">
+            <a href="{% url 'dashboard' %}" class="text-white hover:text-gray-200 text-sm">Dashboard</a>
+            <a href="{% url 'owner_panel' %}" class="text-white hover:text-gray-200 text-sm">My Panel</a>
+            <a href="{% url 'logout' %}" class="text-white hover:text-gray-200 text-sm">Logout</a>
+        </div>
+    </header>
+
+    <!-- Main Content Area -->
+    <main class="flex-grow p-4 md:p-8 bg-gray-100">
+        <div class="max-w-7xl mx-auto">
+            
+            <!-- Owner Header -->
+            <div class="mb-8">
+                <h1 class="text-3xl font-bold text-gray-800 mb-2">Department Owner Dashboard</h1>
+                <p class="text-gray-600">Logged in as: <span class="font-medium">{{ user_email }}</span></p>
+            </div>
+
+            <!-- Owner Information Card -->
+            <div class="bg-white rounded-lg shadow-md p-6 mb-8">
+                <h2 class="text-xl font-semibold text-gray-800 mb-4 pb-2 border-b border-gray-200">Your Information</h2>
+                
+                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                    <div>
+                        <p class="text-sm font-medium text-gray-500 mb-1">Business Name</p>
+                        <p class="text-base text-gray-900">{{ user.business_name }}</p>
+                    </div>
+                    
+                    <div>
+                        <p class="text-sm font-medium text-gray-500 mb-1">Department</p>
+                        <p class="text-base text-gray-900">{{ user.department_name }}</p>
+                    </div>
+                    
+                    <div>
+                        <p class="text-sm font-medium text-gray-500 mb-1">Contact Person</p>
+                        <p class="text-base text-gray-900">{{ user.contact_person }}</p>
+                    </div>
+                    
+                    <div>
+                        <p class="text-sm font-medium text-gray-500 mb-1">Contact Number</p>
+                        <p class="text-base text-gray-900">{{ user.contact_number }}</p>
+                    </div>
+                    
+                    <div>
+                        <p class="text-sm font-medium text-gray-500 mb-1">Email</p>
+                        <p class="text-base text-gray-900">{{ user.email }}</p>
+                    </div>
+                    
+                    <div>
+                        <p class="text-sm font-medium text-gray-500 mb-1">Account Status</p>
+                        {% if user.is_active %}
+                            <span class="px-3 py-1 inline-flex text-xs leading-5 font-semibold rounded-full bg-green-100 text-green-800">Active</span>
+                        {% else %}
+                            <span class="px-3 py-1 inline-flex text-xs leading-5 font-semibold rounded-full bg-red-100 text-red-800">Inactive</span>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+
+            <!-- Your Departments Section -->
+            <div class="bg-white rounded-lg shadow-md p-6">
+                <h2 class="text-xl font-semibold text-gray-800 mb-6 pb-2 border-b border-gray-200">Your Departments</h2>
+                
+                {% if departments %}
+                    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                        {% for department in departments %}
+                        <div class="bg-gray-50 rounded-lg border border-gray-200 overflow-hidden hover:shadow-lg transition-shadow duration-200">
+                            
+                            <!-- Department Logo -->
+                            <div class="h-40 bg-white flex items-center justify-center border-b border-gray-200">
+                                {% if department.logo_path %}
+                                    <img src="{{ department.logo_path.url }}" alt="{{ department.department_name }}" class="max-h-full max-w-full object-contain p-4">
+                                {% else %}
+                                    <div class="text-gray-400 text-center p-4">
+                                        <svg class="w-16 h-16 mx-auto mb-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"></path>
+                                        </svg>
+                                        <span class="text-xs">No Logo</span>
+                                    </div>
+                                {% endif %}
+                            </div>
+
+                            <!-- Department Info -->
+                            <div class="p-4">
+                                <h3 class="font-semibold text-gray-800 mb-1 truncate">{{ department.department_name }}</h3>
+                                <p class="text-sm text-gray-600 mb-3 truncate">{{ department.business_name }}</p>
+                                
+                                <!-- Status Badge -->
+                                <div class="mb-4">
+                                    {% if department.partnership_status == 'Active' %}
+                                        <span class="px-3 py-1 inline-flex text-xs leading-5 font-semibold rounded-full bg-green-100 text-green-800">Active Partnership</span>
+                                    {% elif department.partnership_status == 'Inactive' %}
+                                        <span class="px-3 py-1 inline-flex text-xs leading-5 font-semibold rounded-full bg-red-100 text-red-800">Inactive</span>
+                                    {% elif department.partnership_status == 'Pending' %}
+                                        <span class="px-3 py-1 inline-flex text-xs leading-5 font-semibold rounded-full bg-yellow-100 text-yellow-800">Pending</span>
+                                    {% else %}
+                                        <span class="px-3 py-1 inline-flex text-xs leading-5 font-semibold rounded-full bg-gray-100 text-gray-800">{{ department.partnership_status }}</span>
+                                    {% endif %}
+                                </div>
+
+                                <!-- Action Buttons -->
+                                <div class="flex gap-2">
+                                    <a href="{% url 'department_info' department.department_id %}" 
+                                       class="flex-1 text-center px-3 py-2 bg-blue-600 text-white text-sm font-medium rounded hover:bg-blue-700 transition-colors duration-150">
+                                        View
+                                    </a>
+                                    <a href="{% url 'edit_department' department.department_id %}" 
+                                       class="flex-1 text-center px-3 py-2 bg-green-600 text-white text-sm font-medium rounded hover:bg-green-700 transition-colors duration-150">
+                                        Edit
+                                    </a>
+                                </div>
+                            </div>
+                        </div>
+                        {% endfor %}
+                    </div>
+                {% else %}
+                    <div class="text-center py-12">
+                        <svg class="w-16 h-16 mx-auto text-gray-400 mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 13V6a2 2 0 00-2-2H6a2 2 0 00-2 2v7m16 0v5a2 2 0 01-2 2H6a2 2 0 01-2-2v-5m16 0h-2.586a1 1 0 00-.707.293l-2.414 2.414a1 1 0 01-.707.293h-3.172a1 1 0 01-.707-.293l-2.414-2.414A1 1 0 006.586 13H4"></path>
+                        </svg>
+                        <p class="text-gray-500 text-lg mb-2">No departments found</p>
+                        <p class="text-gray-400 text-sm">Contact the administrator to set up your department</p>
+                    </div>
+                {% endif %}
+            </div>
+        </div>
+    </main>
+</body>
+</html>
