@@ -279,8 +279,8 @@ def admin_panel_view(request):
     # Compute stats
     stats = {
         'total_departments': Department.objects.count(),
-        'active_partnerships': Department.objects.filter(partnership_status='OK').count(),
-        'pending_partnerships': Department.objects.filter(partnership_status='UNIDENTIFIED').count(),
+        'active_partnerships': Department.objects.filter(partnership_status='active').count(),
+        'pending_partnerships': Department.objects.filter(partnership_status='pending').count(),
         'total_users': User.objects.count(),
     }
 
