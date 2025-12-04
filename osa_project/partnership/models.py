@@ -10,7 +10,7 @@ class UserProfile(models.Model):
     )
 
     user = models.OneToOneField(User, on_delete=models.CASCADE, related_name='profile')
-    business_name = models.CharField(max_length=255)
+    business_email = models.EmailField(max_length=255)
     department_name = models.CharField(max_length=255)
     contact_person = models.CharField(max_length=255)
     contact_number = models.CharField(max_length=50)
@@ -31,7 +31,7 @@ class Department(models.Model):
 
     owner = models.ForeignKey(User, on_delete=models.CASCADE, related_name='departments')
     department_name = models.CharField(max_length=255)
-    business_name = models.CharField(max_length=255)
+    business_email = models.EmailField(max_length=255)
     email = models.EmailField()
     contact_person = models.CharField(max_length=255, blank=True)
     contact_number = models.CharField(max_length=50, blank=True)
@@ -44,10 +44,9 @@ class Department(models.Model):
     last_updated = models.DateTimeField(auto_now=True)
 
     def __str__(self):
-        return f"{self.department_name} ({self.business_name})"
+        return f"{self.department_name} ({self.business_email})"
 
     @property
     def status_color(self):
-        # Optional: return color based on status for admin display
         colors = {'active': 'green', 'inactive': 'red', 'pending': 'orange'}
         return colors.get(self.partnership_status, 'black')

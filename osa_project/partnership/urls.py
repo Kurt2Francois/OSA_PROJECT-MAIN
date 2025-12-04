@@ -22,6 +22,7 @@ urlpatterns = [
     path('department/<int:dept_id>/edit/', views.department_edit_view, name='department_edit'),
     
     path('admin-panel/', views.admin_panel_view, name='admin_panel'),
+    path('admin-panel/user/<int:user_id>/delete/', views.user_delete_view, name='user_delete'),
     path('owner-panel/', views.owner_panel_view, name='owner_panel'),
     
     path('owner-panel/department/add/', views.department_add_view, name='department_add'),

@@ -9,6 +9,8 @@ from .serializers import UserSerializer, DepartmentSerializer
 from partnership.models import Department
 from django.shortcuts import redirect, render
 from django.contrib.auth import authenticate, login
+from django.core.validators import validate_email
+from django.core.exceptions import ValidationError
 
 
 
@@ -16,7 +18,7 @@ from django.contrib.auth import authenticate, login
 def ensure_default_department():
     if not Department.objects.exists():
         Department.objects.create(
-            business_name="Default Business",
+            business_email="admin@example.com",
             department_name="Default Department",
             contact_person="Admin",
             contact_number="0000-0000",
@@ -43,7 +45,7 @@ def department_edit_view(request, dept_id):
 
     if request.method == 'POST':
         # Update text fields
-        department.business_name = request.POST.get('business_name')
+        department.business_email = request.POST.get('business_email')
         department.department_name = request.POST.get('department_name')
         department.contact_person = request.POST.get('contact_person')
         department.contact_number = request.POST.get('contact_number')
@@ -80,7 +82,7 @@ def department_edit_view(request, dept_id):
 # -----------------------------
 def signup_view(request):
     if request.method == 'POST':
-        business_name = request.POST.get('business_name')
+        business_email = request.POST.get('business_email')
         department_name = request.POST.get('department_name')
         contact_person = request.POST.get('contact_person')
         contact_number = request.POST.get('contact_number')
@@ -104,10 +106,17 @@ def signup_view(request):
         username = email.split('@')[0] + str(User.objects.count() + 1)
         user = User.objects.create_user(username=username, email=email, password=password)
 
+        # Validate business email
+        try:
+            validate_email(business_email)
+        except ValidationError:
+            messages.error(request, 'Invalid business email')
+            return render(request, 'partnership/signup.html')
+
         # Create UserProfile
         UserProfile.objects.create(
             user=user,
-            business_name=business_name,
+            business_email=business_email,
             department_name=department_name,
             contact_person=contact_person,
             contact_number=contact_number,
@@ -117,7 +126,7 @@ def signup_view(request):
         # Create Department
         department = Department.objects.create(
             owner=user,
-            business_name=business_name,
+            business_email=business_email,
             department_name=department_name,
             contact_person=contact_person,
             contact_number=contact_number,
@@ -136,11 +145,6 @@ def signup_view(request):
 # -----------------------------
 # Login View
 # -----------------------------
-from django.shortcuts import render, redirect
-from django.contrib.auth import authenticate, login
-from django.contrib import messages
-from .models import User, Department
-
 def login_view(request):
     # If user already logged in
     if request.user.is_authenticated:
@@ -211,17 +215,6 @@ def department_detail_view(request, dept_id):
 # -----------------------------
 @login_required
 def dashboard_view(request):
-    # Ensure at least one default department exists
-    if not Department.objects.exists():
-        Department.objects.create(
-            business_name="Default Business",
-            department_name="Default Department",
-            contact_person="Admin",
-            contact_number="0000-0000",
-            email="admin@example.com",
-            partnership_status="OK"
-        )
-
     # If the user is an owner/admin, show all departments, otherwise only their own
     user_profile = getattr(request.user, 'profile', None)
     
@@ -285,38 +278,79 @@ def admin_panel_view(request):
     }
 
     departments = Department.objects.all()
+    users = User.objects.all()
     return render(request, 'partnership/admin_panel.html', {
         'stats': stats,
         'departments': departments,
+        'users': users,
         'user_email': request.user.email,  # optional, if you show email in template
     })
 
 
 @login_required
 def department_delete_view(request, dept_id):
+    """
+    Delete a department:
+    - Superusers and admins can delete any department
+    - Owners can only delete their own department
+    """
     department = get_object_or_404(Department, id=dept_id)
-
     user_profile = getattr(request.user, 'profile', None)
-    if department.owner != request.user and not request.user.is_superuser and not (user_profile and user_profile.user_type in ['owner', 'admin']):
+
+    # Check permissions
+    is_admin = request.user.is_superuser or (user_profile and user_profile.user_type == 'admin')
+    is_owner = department.owner == request.user
+
+    if not (is_admin or is_owner):
         messages.error(request, "You don't have permission to delete this department.")
         return redirect('dashboard')
 
     if request.method == 'POST':
+        dept_name = department.department_name
         department.delete()
-        messages.success(request, "Department deleted successfully!")
-        return redirect('dashboard')
+        messages.success(request, f"Department '{dept_name}' deleted successfully!")
+        
+        # Redirect admins to admin panel, others to dashboard
+        if is_admin:
+            return redirect('admin_panel')
+        else:
+            return redirect('dashboard')
 
-    return render(request, 'partnership/department_delete.html', {'department': department})
+    return render(request, 'partnership/department_delete_confirm.html', {'department': department})
 
 
 @login_required
 def department_add_view(request):
     return render(request, 'partnership/department_add.html')
 
+
 @login_required
-def department_delete_view(request, dept_id):
-    # Logic can be implemented later
-    return render(request, 'partnership/department_delete.html', {'dept_id': dept_id})
+def user_delete_view(request, user_id):
+    """
+    Delete a user:
+    - Only superusers can delete users
+    - Cannot delete yourself
+    """
+    user_to_delete = get_object_or_404(User, id=user_id)
+    user_profile = getattr(request.user, 'profile', None)
+
+    # Check permissions - only superuser can delete users
+    if not request.user.is_superuser:
+        messages.error(request, "You don't have permission to delete users.")
+        return redirect('admin_panel')
+
+    # Cannot delete yourself
+    if user_to_delete == request.user:
+        messages.error(request, "You cannot delete your own account.")
+        return redirect('admin_panel')
+
+    if request.method == 'POST':
+        username = user_to_delete.username
+        user_to_delete.delete()
+        messages.success(request, f"User '{username}' deleted successfully!")
+        return redirect('admin_panel')
+
+    return render(request, 'partnership/user_delete_confirm.html', {'user_to_delete': user_to_delete})
 
 
 # -----------------------------

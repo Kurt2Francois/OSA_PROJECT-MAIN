@@ -15,7 +15,7 @@ class UserSerializer(serializers.ModelSerializer):
     def get_profile(self, obj):
         if hasattr(obj, 'profile'):
             return {
-                'business_name': obj.profile.business_name,
+                'business_email': obj.profile.business_email,
                 'department_name': obj.profile.department_name,
                 'contact_person': obj.profile.contact_person,
                 'contact_number': obj.profile.contact_number,
@@ -64,7 +64,7 @@ class DepartmentSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Department
-        fields = ['id', 'owner', 'user_email', 'department_name', 'business_name',
+        fields = ['id', 'owner', 'user_email', 'department_name', 'business_email',
                   'email', 'logo_path', 'established_date', 'expiration_date',
                   'partnership_status', 'status_color', 'remarks_status', 'created_at', 'last_updated']
         read_only_fields = ['id', 'created_at', 'last_updated']

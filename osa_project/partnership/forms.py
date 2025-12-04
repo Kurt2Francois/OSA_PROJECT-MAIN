@@ -15,9 +15,9 @@ class UserRegistrationForm(forms.ModelForm):
     
     class Meta:
         model = User
-        fields = ['business_name', 'department_name', 'contact_person', 'contact_number', 'email']
+        fields = ['business_email', 'department_name', 'contact_person', 'contact_number', 'email']
         widgets = {
-            'business_name': forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Business Name'}),
+            'business_email': forms.EmailInput(attrs={'class': 'form-control', 'placeholder': 'Business Email'}),
             'department_name': forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Department Name'}),
             'contact_person': forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Contact Person'}),
             'contact_number': forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Contact Number'}),
@@ -60,11 +60,11 @@ class DepartmentForm(forms.ModelForm):
     """Form for department editing"""
     class Meta:
         model = Department
-        fields = ['department_name', 'business_name', 'email', 'logo_path', 
+        fields = ['department_name', 'business_email', 'email', 'logo_path', 
                   'established_date', 'expiration_date', 'partnership_status', 'remarks_status']
         widgets = {
             'department_name': forms.TextInput(attrs={'class': 'form-control'}),
-            'business_name': forms.TextInput(attrs={'class': 'form-control'}),
+            'business_email': forms.EmailInput(attrs={'class': 'form-control'}),
             'email': forms.EmailInput(attrs={'class': 'form-control'}),
             'established_date': forms.DateInput(attrs={'class': 'form-control', 'type': 'date'}),
             'expiration_date': forms.DateInput(attrs={'class': 'form-control', 'type': 'date'}),

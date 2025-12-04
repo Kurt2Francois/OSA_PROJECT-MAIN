@@ -19,7 +19,7 @@ def edit_department_view(request, department_id):
     
     if request.method == 'POST':
         department.department_name = request.POST.get('department_name')
-        department.business_name = request.POST.get('business_name')
+        department.business_email = request.POST.get('business_email')
         department.email = request.POST.get('email')
         department.established_date = request.POST.get('established_date')
         department.expiration_date = request.POST.get('expiration_date')
